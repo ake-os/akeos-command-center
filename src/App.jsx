@@ -82,6 +82,26 @@ const navItems = [
   ["♧", "Resources", false],
   ["⚙", "Settings", false],
 ];
+const strategicMeetings = [
+  {
+    time: "09:00",
+    title: "Board Strategy Review",
+    badge: "Critical",
+    prep: "Revenue forecast + GTM risks",
+  },
+  {
+    time: "13:00",
+    title: "Stuttgart Strategy Days Prep",
+    badge: "Strategic",
+    prep: "Leadership narrative alignment",
+  },
+  {
+    time: "17:30",
+    title: "Family Planning Session",
+    badge: "Family",
+    prep: "Germany/US coordination",
+  },
+];
 
 function Panel({ title, icon, children, className = "" }) {
   return (
@@ -300,11 +320,36 @@ export default function AKEOSCommandCenterV1() {
               <div className="mt-5 max-h-[320px] overflow-y-auto rounded-lg border border-[#24445a] bg-[#0a263a]/40 p-5">
                 <div className="space-y-4 text-sm leading-7 text-[#e5edf2]">
                   {summary
-                    .split("\n")
-                    .filter((line) => line.trim() !== "")
-                    .map((line, index) => (
-                      <p key={index}>{line}</p>
-                    ))}
+  .split("\n")
+  .filter((line) => line.trim() !== "")
+  .map((line, index) => {
+    if (line.startsWith("# ")) {
+      return (
+        <h2 key={index} className="text-lg font-semibold text-white">
+          {line.replace("# ", "")}
+        </h2>
+      );
+    }
+
+    if (line.startsWith("## ")) {
+      return (
+        <h3 key={index} className="pt-2 text-base font-semibold text-[#f3d28d]">
+          {line.replace("## ", "")}
+        </h3>
+      );
+    }
+
+    if (line.startsWith("- ")) {
+      return (
+        <div key={index} className="flex gap-3">
+          <span className="text-[#d6ad63]">•</span>
+          <span>{line.replace("- ", "")}</span>
+        </div>
+      );
+    }
+
+    return <p key={index}>{line}</p>;
+  })}
                 </div>
               </div>
 
@@ -322,17 +367,42 @@ export default function AKEOSCommandCenterV1() {
               <FooterLink>Open Full Brief</FooterLink>
             </Panel>
 
-            <Panel title="2. Active State" icon="♙">
-              <div className="space-y-4 text-sm">
-                {activeStateItems.map(([label, value]) => (
-                  <div key={label} className="flex justify-between gap-4">
-                    <span className="text-[#aab7c0]">{label}</span>
-                    <span className="text-right text-white">{value}</span>
-                  </div>
-                ))}
-              </div>
-              <FooterLink>View Full Active State</FooterLink>
-            </Panel>
+            <Panel title="2. Strategic Meetings" icon="✦">
+  <div className="space-y-4 text-sm">
+    {strategicMeetings.map((meeting) => (
+      <div
+        key={meeting.title}
+        className="rounded-xl border border-[#24445a] bg-[#0a263a] p-4"
+      >
+        <div className="flex items-center justify-between">
+          <div className="text-[#f3d28d]">{meeting.time}</div>
+
+          <Status
+            tone={
+              meeting.badge === "Critical"
+                ? "red"
+                : meeting.badge === "Strategic"
+                ? "gold"
+                : "green"
+            }
+          >
+            {meeting.badge}
+          </Status>
+        </div>
+
+        <div className="mt-2 text-base text-white">
+          {meeting.title}
+        </div>
+
+        <div className="mt-2 text-xs text-[#aab7c0]">
+          Prep: {meeting.prep}
+        </div>
+      </div>
+    ))}
+  </div>
+
+  <FooterLink>View Full Meeting Intelligence</FooterLink>
+</Panel>
 
             <Panel title="3. Current Priorities" icon="☷">
               <div className="space-y-4">
