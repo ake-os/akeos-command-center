@@ -1,55 +1,380 @@
-import React from "react";
-
-const logoSrc = "data:image/jpeg;base64,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";
+import React, { useEffect, useState } from "react";
+import { fetchDailyLog } from "./services/obsidian";
+import { parseDailyBrief } from "./services/briefParser";
 
 const today = new Date();
-const dateLabel = today.toLocaleDateString(undefined, { month: "long", day: "numeric", year: "numeric" });
 
-const navItems = [["⌂", "Command Center", true], ["▤", "Daily Brief", false], ["◎", "Active State", false], ["▥", "GTM War Room", false], ["▣", "Calendar", false], ["♟", "Relationships", false], ["♧", "Resources", false], ["⚙", "Settings", false]];
-const weatherHomes = [{ place: "Edison, NJ", temp: "63°F", condition: "Partly Cloudy", high: "72°", low: "52°", rain: "42%", wind: "7 mph", icon: "🌤️" }, { place: "Swisttal, Germany", temp: "57°F", condition: "Mostly Cloudy", high: "66°", low: "48°", rain: "55%", wind: "6 mph", icon: "⛅" }];
-const priorities = [["Drive GTM Execution & Pipeline", "High"], ["Prepare Strategy Days Stuttgart", "High"], ["Increase Strategic Visibility", "Medium"]];
-const risks = ["Operational overload and excessive context switching", "Overdependence on Swen’s daily briefing when unavailable"];
-const opportunities = ["Turn War Room metrics into executive synthesis", "Use AKEOS as a GTM intelligence layer"];
-const gtmOperatingRhythm = [["Daily Management Call", "2pm CET / 8am EST"], ["War Room", "Looker KPI dashboard review"], ["GTM Focus", "Forecast, OKRs, open issues"], ["Meeting Intelligence", "Notion notes + recordings"]];
-const futureModules = ["7. War Room KPIs", "8. Swen Briefing", "9. Calendar Intelligence", "10. News / Research"];
-const quickGlanceItems = [["Focus Today", "Execute with Excellence"], ["Top Priority", "GTM Execution & Pipeline"], ["Energy", "High"], ["Time Block", "Deep Work"], ["Next Up", "GTM Leadership Call"]];
-const activeStateItems = [["Identity", "Builder & Steward"], ["Season", "Build & Scale"], ["Primary Focus", "GTM Execution"], ["Energy State", "High"], ["Mindset", "Disciplined Optimism"]];
+const greeting =
+  today.getHours() < 12
+    ? "Good morning, Andy."
+    : today.getHours() < 18
+    ? "Good afternoon, Andy."
+    : "Good evening, Andy.";
 
-function Logo({ small = false }) {
-  return <img src={logoSrc} alt="Cale Family Trust Crest" className={`${small ? "h-12 w-12" : "h-28 w-28"} mx-auto rounded-full border border-[#d6ad63]/50 object-cover shadow-[0_0_35px_rgba(214,173,99,.22)]`} />;
-}
+const dateLabel = today.toLocaleDateString(undefined, {
+  month: "long",
+  day: "numeric",
+  year: "numeric",
+});
+
+const weatherHomes = [
+  {
+    place: "Edison, NJ",
+    temp: "63°F",
+    condition: "Partly Cloudy",
+    high: "72°",
+    low: "52°",
+    rain: "42%",
+    wind: "7 mph",
+    icon: "🌤️",
+  },
+  {
+    place: "Swisttal, Germany",
+    temp: "57°F",
+    condition: "Mostly Cloudy",
+    high: "66°",
+    low: "48°",
+    rain: "55%",
+    wind: "6 mph",
+    icon: "⛅",
+  },
+];
+
+const fallbackPriorities = [
+  ["Drive GTM Execution & Pipeline", "High"],
+  ["Prepare Strategy Days Stuttgart", "High"],
+  ["Increase Strategic Visibility", "Medium"],
+];
+
+const fallbackRisks = [
+  "Operational overload and excessive context switching",
+  "Overdependence on Swen’s daily briefing when unavailable",
+];
+
+const fallbackOpportunities = [
+  "Turn War Room metrics into executive synthesis",
+  "Use AKEOS as a GTM intelligence layer",
+];
+
+const quickGlanceItems = [
+  ["Focus Today", "Execute with Excellence"],
+  ["Top Priority", "GTM Execution & Pipeline"],
+  ["Energy", "High"],
+  ["Time Block", "Deep Work"],
+  ["Next Up", "GTM Leadership Call"],
+];
+
+const activeStateItems = [
+  ["Identity", "Builder & Steward"],
+  ["Season", "Build & Scale"],
+  ["Primary Focus", "GTM Execution"],
+  ["Energy State", "High"],
+  ["Mindset", "Disciplined Optimism"],
+];
+
+const navItems = [
+  ["⌂", "Command Center", true],
+  ["▤", "Daily Brief", false],
+  ["◎", "Active State", false],
+  ["▥", "GTM War Room", false],
+  ["▣", "Calendar", false],
+  ["♟", "Relationships", false],
+  ["♧", "Resources", false],
+  ["⚙", "Settings", false],
+];
 
 function Panel({ title, icon, children, className = "" }) {
-  return <section className={`rounded-xl border border-[#24445a] bg-[#071d2d]/85 shadow-[0_0_30px_rgba(0,0,0,.25)] ${className}`}><div className="flex items-center gap-3 border-b border-[#24445a]/80 px-5 py-4"><span className="text-xl text-[#d6ad63]">{icon}</span><h2 className="text-sm font-semibold uppercase tracking-[0.08em] text-[#f3e6c8]">{title}</h2></div><div className="p-5">{children}</div></section>;
+  return (
+    <section
+      className={`rounded-xl border border-[#24445a] bg-[#071d2d]/85 shadow-[0_0_30px_rgba(0,0,0,.25)] ${className}`}
+    >
+      <div className="flex items-center gap-3 border-b border-[#24445a]/80 px-5 py-4">
+        <span className="text-xl text-[#d6ad63]">{icon}</span>
+        <h2 className="text-sm font-semibold uppercase tracking-[0.08em] text-[#f3e6c8]">
+          {title}
+        </h2>
+      </div>
+      <div className="p-5">{children}</div>
+    </section>
+  );
 }
 
 function MetricBox({ icon, value, label }) {
-  return <div className="rounded-lg border border-[#24445a] bg-[#0a263a] p-4 text-center"><div className="text-2xl text-[#d6ad63]">{icon}</div><div className="mt-1 text-2xl font-semibold text-white">{value}</div><div className="mt-1 text-xs leading-4 text-[#b7c5cf]">{label}</div></div>;
+  return (
+    <div className="rounded-lg border border-[#24445a] bg-[#0a263a] p-4 text-center">
+      <div className="text-2xl text-[#d6ad63]">{icon}</div>
+      <div className="mt-1 text-2xl font-semibold text-white">{value}</div>
+      <div className="mt-1 text-xs leading-4 text-[#b7c5cf]">{label}</div>
+    </div>
+  );
 }
 
 function Status({ children, tone = "green" }) {
-  const colors = { green: "border-emerald-500/30 bg-emerald-500/20 text-emerald-200", gold: "border-[#d6ad63]/40 bg-[#d6ad63]/20 text-[#f3d28d]", blue: "border-sky-500/30 bg-sky-500/20 text-sky-200" };
-  return <span className={`rounded-full border px-3 py-1 text-xs ${colors[tone] || colors.green}`}>{children}</span>;
+  const colors = {
+    green: "border-emerald-500/30 bg-emerald-500/20 text-emerald-200",
+    gold: "border-[#d6ad63]/40 bg-[#d6ad63]/20 text-[#f3d28d]",
+    blue: "border-sky-500/30 bg-sky-500/20 text-sky-200",
+  };
+
+  return (
+    <span className={`rounded-full border px-3 py-1 text-xs ${colors[tone]}`}>
+      {children}
+    </span>
+  );
 }
 
 function FooterLink({ children }) {
-  return <button className="mt-5 w-full rounded-lg border border-[#d6ad63]/60 px-4 py-3 text-sm font-medium text-[#d6ad63] hover:bg-[#d6ad63]/10">{children} →</button>;
+  return (
+    <button className="mt-5 w-full rounded-lg border border-[#d6ad63]/60 px-4 py-3 text-sm font-medium text-[#d6ad63] hover:bg-[#d6ad63]/10">
+      {children} →
+    </button>
+  );
 }
 
 export default function AKEOSCommandCenterV1() {
+  const [dailyLog, setDailyLog] = useState("");
+  const [dailyLogError, setDailyLogError] = useState("");
+  const [parsedBrief, setParsedBrief] = useState(null);
+
+  useEffect(() => {
+    fetchDailyLog()
+      .then((text) => {
+        setDailyLog(text);
+        setParsedBrief(parseDailyBrief(text));
+      })
+      .catch((error) => {
+        console.error(error);
+        setDailyLogError("Daily Executive Brief is not available yet.");
+      });
+  }, []);
+
+  const priorities =
+    parsedBrief?.priorities?.length > 0
+      ? parsedBrief.priorities.map((item) => [item, "High"])
+      : fallbackPriorities;
+
+  const risks =
+    parsedBrief?.risks?.length > 0 ? parsedBrief.risks : fallbackRisks;
+
+  const opportunities =
+    parsedBrief?.opportunities?.length > 0
+      ? parsedBrief.opportunities
+      : fallbackOpportunities;
+
+  const summary =
+    parsedBrief?.executiveSummary ||
+    dailyLogError ||
+    "Loading Daily Executive Brief...";
+
   return (
     <main className="min-h-screen bg-[#061827] text-[#f7f0df]">
       <div className="flex min-h-screen">
         <aside className="hidden w-72 shrink-0 border-r border-[#24445a] bg-[#051522] p-5 lg:flex lg:flex-col">
-          <div className="pt-3 text-center"><Logo /><div className="mt-4 font-serif text-4xl tracking-[0.18em] text-[#f3e6c8]">CALE</div><div className="mt-1 font-serif text-lg tracking-[0.23em] text-[#d6ad63]">FAMILY TRUST</div></div>
-          <nav className="mt-10 space-y-2">{navItems.map(([icon, label, active]) => <div key={label} className={`flex items-center gap-4 rounded-lg px-4 py-3 text-sm ${active ? "border-l-2 border-[#d6ad63] bg-white/10 text-[#f3d28d]" : "text-[#c6d2da] hover:bg-white/5"}`}><span className="text-xl text-[#d6ad63]">{icon}</span><span>{label}</span></div>)}</nav>
-          <div className="mt-auto text-center"><div className="font-serif text-3xl tracking-[0.12em] text-[#d6ad63]">AKEOS</div><div className="mt-1 text-xs uppercase tracking-[0.2em] text-[#aab7c0]">Personal Operating System</div><div className="mt-5 text-xs text-[#7f95a3]">v1.0.0</div></div>
+          <div className="pt-3 text-center">
+            <div className="mx-auto flex h-28 w-28 items-center justify-center rounded-full border border-[#d6ad63]/60 text-center text-sm text-[#f3e6c8]">
+              Cale Family Trust Crest
+            </div>
+            <div className="mt-4 font-serif text-4xl tracking-[0.18em] text-[#f3e6c8]">
+              CALE
+            </div>
+            <div className="mt-1 font-serif text-lg tracking-[0.23em] text-[#d6ad63]">
+              FAMILY TRUST
+            </div>
+          </div>
+
+          <nav className="mt-10 space-y-2">
+            {navItems.map(([icon, label, active]) => (
+              <div
+                key={label}
+                className={`flex items-center gap-4 rounded-lg px-4 py-3 text-sm ${
+                  active
+                    ? "border-l-2 border-[#d6ad63] bg-white/10 text-[#f3d28d]"
+                    : "text-[#c6d2da] hover:bg-white/5"
+                }`}
+              >
+                <span className="text-xl text-[#d6ad63]">{icon}</span>
+                <span>{label}</span>
+              </div>
+            ))}
+          </nav>
         </aside>
+
         <section className="flex-1 overflow-hidden bg-[radial-gradient(circle_at_top_left,#123f5a_0%,transparent_35%),linear-gradient(135deg,#071d2d,#061827_55%,#020c15)] p-5 lg:p-8">
-          <header className="grid gap-6 border-b border-[#24445a] pb-7 xl:grid-cols-[1.4fr_.8fr_.9fr]"><div><div className="mb-3 inline-flex rounded-full border border-[#d6ad63]/30 bg-[#d6ad63]/10 px-3 py-1 text-xs uppercase tracking-[0.18em] text-[#f3d28d]">All systems operational</div><h1 className="font-serif text-4xl tracking-[0.16em] text-[#f3d28d] lg:text-5xl">AKEOS COMMAND CENTER</h1><p className="mt-3 text-sm uppercase tracking-[0.28em] text-[#d6ad63]">Execute Today. Build Tomorrow. Preserve Forever.</p></div><div className="border-l border-[#24445a] pl-6"><div className="text-sm text-[#d6ad63]">▣ {dateLabel}</div><div className="mt-3 text-2xl font-light text-white">Good morning, Andy.</div></div><div className="border-l border-[#24445a] pl-6"><div className="font-serif text-5xl leading-none text-[#d6ad63]">“</div><p className="font-serif text-xl leading-7 text-[#f3e6c8]">The best way to predict the future is to create it.</p><p className="mt-3 text-[#d6ad63]">— Peter Drucker</p></div></header>
-          <div className="mt-7 grid gap-5 xl:grid-cols-[1.15fr_.9fr_1.1fr]"><Panel title="Weather" icon="☁"><div className="grid gap-4 md:grid-cols-2">{weatherHomes.map((home) => <div key={home.place} className="rounded-lg border border-[#24445a] bg-[#0a263a] p-4"><div className="inline-block rounded bg-white/10 px-2 py-1 text-sm text-[#f3e6c8]">{home.place}</div><div className="mt-5 flex items-center gap-4"><div className="text-5xl">{home.icon}</div><div><div className="text-4xl font-light text-white">{home.temp}</div><div className="text-sm text-[#b7c5cf]">{home.condition}</div></div></div><div className="mt-5 grid grid-cols-2 gap-3 border-t border-[#24445a] pt-4 text-sm text-[#c6d2da]"><div>↑ {home.high}</div><div>↓ {home.low}</div><div>♢ {home.rain}</div><div>≋ {home.wind}</div></div></div>)}</div></Panel><Panel title="Quote of the Day" icon="“"><p className="font-serif text-2xl leading-9 text-[#f3e6c8]">Discipline is choosing between what you want now and what you want most.</p><p className="mt-5 text-[#d6ad63]">— Abraham Lincoln</p></Panel><Panel title="Quick Glance" icon="▤"><div className="space-y-4 text-sm">{quickGlanceItems.map(([label, value]) => <div key={label} className="flex items-center justify-between border-b border-[#24445a] pb-3"><span className="text-[#c6d2da]">{label}</span><span className="text-right text-white">{value}</span></div>)}</div></Panel></div>
-          <div className="mt-5 grid gap-5 xl:grid-cols-[1.4fr_.8fr_.9fr]"><Panel title="1. Today’s Daily Executive Brief" icon="▧" className="xl:row-span-2"><div className="text-xs text-[#8ea3b0]">Generated this morning • 6:02 AM</div><p className="mt-5 text-sm leading-7 text-[#e5edf2]">You are entering a high-leverage execution day with strong focus on GTM momentum, Strategy Days preparation, and the continued buildout of AKEOS. Protect deep work blocks, reduce context switching, and keep family alignment visible.</p><div className="mt-6 grid grid-cols-2 gap-3 md:grid-cols-4"><MetricBox icon="✓" value="3" label="Priorities On Track" /><MetricBox icon="⚠" value="2" label="Risks Monitoring" /><MetricBox icon="↗" value="2" label="Opportunities Active" /><MetricBox icon="▣" value="5" label="Commitments This Week" /></div><FooterLink>Open Full Brief</FooterLink></Panel><Panel title="2. Active State" icon="♙"><div className="space-y-4 text-sm">{activeStateItems.map(([label, value]) => <div key={label} className="flex justify-between gap-4"><span className="text-[#aab7c0]">{label}</span><span className="text-right text-white">{value}</span></div>)}</div><FooterLink>View Full Active State</FooterLink></Panel><Panel title="3. Current Priorities" icon="☷"><div className="space-y-4">{priorities.map(([priority, status], index) => <div key={priority} className="flex items-center gap-4"><div className="flex h-9 w-9 items-center justify-center rounded-full border border-[#d6ad63] text-[#d6ad63]">{index + 1}</div><div className="flex-1 text-sm text-white">{priority}</div><Status tone={status === "High" ? "green" : "gold"}>{status}</Status></div>)}</div><FooterLink>View All Priorities</FooterLink></Panel><div className="grid gap-5 md:grid-cols-2 xl:col-span-2"><Panel title="4. Current Risks / Concerns" icon="♢"><ul className="space-y-4 text-sm text-[#e5edf2]">{risks.map((risk) => <li key={risk} className="flex gap-3"><span className="text-red-400">●</span><span>{risk}</span></li>)}</ul><FooterLink>View All Risks</FooterLink></Panel><Panel title="5. Current Opportunities" icon="⌁"><ul className="space-y-4 text-sm text-[#e5edf2]">{opportunities.map((opp) => <li key={opp} className="flex gap-3"><span className="text-emerald-400">●</span><span>{opp}</span></li>)}</ul><FooterLink>View All Opportunities</FooterLink></Panel></div><Panel title="6. GTM Operating Rhythm" icon="⌁"><div className="space-y-4 text-sm">{gtmOperatingRhythm.map(([label, value]) => <div key={label} className="flex justify-between gap-4 border-b border-[#24445a] pb-3"><span className="text-white">{label}</span><span className="text-right text-[#c6d2da]">{value}</span></div>)}</div><FooterLink>View Rhythm</FooterLink></Panel><Panel title="Future Intelligence Modules" icon="▥"><div className="space-y-3">{futureModules.map((item) => <div key={item} className="flex items-center justify-between gap-4 border-b border-[#24445a] pb-3 text-sm"><span className="text-white">{item}</span><Status tone="blue">Coming Soon</Status></div>)}</div></Panel></div>
-          <footer className="mt-7 flex flex-col gap-4 border-t border-[#24445a] pt-5 text-sm text-[#8ea3b0] md:flex-row md:items-center md:justify-between"><div className="flex items-center gap-4"><Logo small /><span className="text-[#f3e6c8]">Cale Family Trust</span><span className="hidden h-8 w-px bg-[#24445a] md:block" /><span>Building generational impact through wisdom, discipline, and trust.</span></div><div>AKEOS Command Center v1.0.0 <span className="ml-3 text-emerald-400">● All Systems Operational</span></div></footer>
+          <header className="grid gap-6 border-b border-[#24445a] pb-7 xl:grid-cols-[1.4fr_.8fr_.9fr]">
+            <div>
+              <div className="mb-3 inline-flex rounded-full border border-[#d6ad63]/30 bg-[#d6ad63]/10 px-3 py-1 text-xs uppercase tracking-[0.18em] text-[#f3d28d]">
+                All systems operational
+              </div>
+              <h1 className="font-serif text-4xl tracking-[0.16em] text-[#f3d28d] lg:text-5xl">
+                AKEOS COMMAND CENTER
+              </h1>
+              <p className="mt-3 text-sm uppercase tracking-[0.28em] text-[#d6ad63]">
+                Execute Today. Build Tomorrow. Preserve Forever.
+              </p>
+            </div>
+
+            <div className="border-l border-[#24445a] pl-6">
+              <div className="text-sm text-[#d6ad63]">▣ {dateLabel}</div>
+              <div className="mt-3 text-2xl font-light text-white">
+                {greeting}
+              </div>
+            </div>
+
+            <div className="border-l border-[#24445a] pl-6">
+              <div className="font-serif text-5xl leading-none text-[#d6ad63]">
+                “
+              </div>
+              <p className="font-serif text-xl leading-7 text-[#f3e6c8]">
+                The best way to predict the future is to create it.
+              </p>
+              <p className="mt-3 text-[#d6ad63]">— Peter Drucker</p>
+            </div>
+          </header>
+
+          <div className="mt-7 grid gap-5 xl:grid-cols-[1.15fr_.9fr_1.1fr]">
+            <Panel title="Weather" icon="☁">
+              <div className="grid gap-4 md:grid-cols-2">
+                {weatherHomes.map((home) => (
+                  <div
+                    key={home.place}
+                    className="rounded-lg border border-[#24445a] bg-[#0a263a] p-4"
+                  >
+                    <div className="inline-block rounded bg-white/10 px-2 py-1 text-sm text-[#f3e6c8]">
+                      {home.place}
+                    </div>
+                    <div className="mt-5 flex items-center gap-4">
+                      <div className="text-5xl">{home.icon}</div>
+                      <div>
+                        <div className="text-4xl font-light text-white">
+                          {home.temp}
+                        </div>
+                        <div className="text-sm text-[#b7c5cf]">
+                          {home.condition}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="mt-5 grid grid-cols-2 gap-3 border-t border-[#24445a] pt-4 text-sm text-[#c6d2da]">
+                      <div>↑ {home.high}</div>
+                      <div>↓ {home.low}</div>
+                      <div>♢ {home.rain}</div>
+                      <div>≋ {home.wind}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </Panel>
+
+            <Panel title="Quote of the Day" icon="“">
+              <p className="font-serif text-2xl leading-9 text-[#f3e6c8]">
+                Discipline is choosing between what you want now and what you
+                want most.
+              </p>
+              <p className="mt-5 text-[#d6ad63]">— Abraham Lincoln</p>
+            </Panel>
+
+            <Panel title="Quick Glance" icon="▤">
+              <div className="space-y-4 text-sm">
+                {quickGlanceItems.map(([label, value]) => (
+                  <div
+                    key={label}
+                    className="flex items-center justify-between border-b border-[#24445a] pb-3"
+                  >
+                    <span className="text-[#c6d2da]">{label}</span>
+                    <span className="text-right text-white">{value}</span>
+                  </div>
+                ))}
+              </div>
+            </Panel>
+          </div>
+
+          <div className="mt-5 grid gap-5 xl:grid-cols-[1.4fr_.8fr_.9fr]">
+            <Panel
+              title="1. Today’s Daily Executive Brief"
+              icon="▧"
+              className="xl:row-span-2"
+            >
+              <div className="text-xs text-[#8ea3b0]">
+                Generated this morning • Live from Obsidian
+              </div>
+
+              <div className="mt-5 max-h-[320px] overflow-y-auto rounded-lg border border-[#24445a] bg-[#0a263a]/40 p-5">
+                <div className="space-y-4 text-sm leading-7 text-[#e5edf2]">
+                  {summary
+                    .split("\n")
+                    .filter((line) => line.trim() !== "")
+                    .map((line, index) => (
+                      <p key={index}>{line}</p>
+                    ))}
+                </div>
+              </div>
+
+              <div className="mt-6 grid grid-cols-2 gap-3 md:grid-cols-4">
+                <MetricBox icon="✓" value="3" label="Priorities On Track" />
+                <MetricBox icon="⚠" value={risks.length} label="Risks Monitoring" />
+                <MetricBox
+                  icon="↗"
+                  value={opportunities.length}
+                  label="Opportunities Active"
+                />
+                <MetricBox icon="▣" value="5" label="Commitments This Week" />
+              </div>
+
+              <FooterLink>Open Full Brief</FooterLink>
+            </Panel>
+
+            <Panel title="2. Active State" icon="♙">
+              <div className="space-y-4 text-sm">
+                {activeStateItems.map(([label, value]) => (
+                  <div key={label} className="flex justify-between gap-4">
+                    <span className="text-[#aab7c0]">{label}</span>
+                    <span className="text-right text-white">{value}</span>
+                  </div>
+                ))}
+              </div>
+              <FooterLink>View Full Active State</FooterLink>
+            </Panel>
+
+            <Panel title="3. Current Priorities" icon="☷">
+              <div className="space-y-4">
+                {priorities.slice(0, 3).map(([priority, status], index) => (
+                  <div key={priority} className="flex items-center gap-4">
+                    <div className="flex h-9 w-9 items-center justify-center rounded-full border border-[#d6ad63] text-[#d6ad63]">
+                      {index + 1}
+                    </div>
+                    <div className="flex-1 text-sm text-white">{priority}</div>
+                    <Status tone={status === "High" ? "green" : "gold"}>
+                      {status}
+                    </Status>
+                  </div>
+                ))}
+              </div>
+              <FooterLink>View All Priorities</FooterLink>
+            </Panel>
+
+            <Panel title="4. Current Risks / Concerns" icon="♢">
+              <ul className="space-y-4 text-sm text-[#e5edf2]">
+                {risks.map((risk) => (
+                  <li key={risk} className="flex gap-3">
+                    <span className="text-red-400">●</span>
+                    <span>{risk}</span>
+                  </li>
+                ))}
+              </ul>
+              <FooterLink>View All Risks</FooterLink>
+            </Panel>
+
+            <Panel title="5. Current Opportunities" icon="⌁">
+              <ul className="space-y-4 text-sm text-[#e5edf2]">
+                {opportunities.map((opp) => (
+                  <li key={opp} className="flex gap-3">
+                    <span className="text-emerald-400">●</span>
+                    <span>{opp}</span>
+                  </li>
+                ))}
+              </ul>
+              <FooterLink>View All Opportunities</FooterLink>
+            </Panel>
+          </div>
         </section>
       </div>
     </main>

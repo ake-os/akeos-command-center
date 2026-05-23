@@ -1,34 +1,49 @@
-export function extractSection(markdown, heading) {
-  if (!markdown) return "";
+export function parseDailyBrief(text) {
+  if (!text) {
+    return {
+      executiveSummary: "",
+      priorities: [],
+      opportunities: [],
+      risks: [],
+    };
+  }
 
-  const pattern = new RegExp(
-    `##\\s*\\d*\\.?\\s*${heading}[\\s\\S]*?(?=\\n##\\s*\\d*\\.?\\s|$)`,
-    "i"
+  const clean = text.replace(/\\n/g, "\n");
+
+  const prioritiesMatch = clean.match(
+    /\*\*Top Priorities\*\*([\s\S]*?)(\*\*|$)/
   );
 
-  const match = markdown.match(pattern);
-  if (!match) return "";
+  const opportunitiesMatch = clean.match(
+    /\*\*Opportunities\*\*([\s\S]*?)(\*\*|$)/
+  );
 
-  return match[0]
-    .replace(/^##\s*\d*\.?\s*.*\n?/i, "")
-    .trim();
-}
+  const risksMatch = clean.match(
+    /\*\*Risks.*?\*\*([\s\S]*?)(\*\*|$)/
+  );
 
-export function parseDailyBrief(markdown) {
   return {
-    executiveSummary: extractSection(markdown, "Executive Summary"),
-    priorities: extractSection(markdown, "Top 3 Priorities")
-      .split("\n")
-      .filter(Boolean),
-    quickGlance: extractSection(markdown, "Quick Glance"),
-    commitments: extractSection(markdown, "Commitments & Follow-ups"),
-    risks: extractSection(markdown, "Risks / Friction")
-      .split("\n")
-      .filter(Boolean),
-    opportunities: extractSection(markdown, "Opportunities")
-      .split("\n")
-      .filter(Boolean),
-    peopleAwareness: extractSection(markdown, "Relationship / People Awareness"),
-    strategicReminder: extractSection(markdown, "Strategic Reminder"),
+    executiveSummary: clean.split("\n").slice(0, 6).join("\n"),
+
+    priorities: prioritiesMatch
+      ? prioritiesMatch[1]
+          .split("\n")
+          .filter((line) => line.trim().startsWith("-"))
+          .map((line) => line.replace("-", "").trim())
+      : [],
+
+    opportunities: opportunitiesMatch
+      ? opportunitiesMatch[1]
+          .split("\n")
+          .filter((line) => line.trim().startsWith("-"))
+          .map((line) => line.replace("-", "").trim())
+      : [],
+
+    risks: risksMatch
+      ? risksMatch[1]
+          .split("\n")
+          .filter((line) => line.trim().startsWith("-"))
+          .map((line) => line.replace("-", "").trim())
+      : [],
   };
 }
