@@ -102,6 +102,17 @@ const strategicMeetings = [
     prep: "Germany/US coordination",
   },
 ];
+const executionReadiness = {
+  score: 82,
+  status: "High Readiness",
+  insight: "Today favors strategic execution over reactive operations.",
+  signals: [
+    ["Strategic Alignment", "High"],
+    ["Meeting Load", "Moderate"],
+    ["GTM Pressure", "Elevated"],
+    ["Focus Protection", "Good"],
+  ],
+};
 
 function Panel({ title, icon, children, className = "" }) {
   return (
@@ -292,19 +303,34 @@ export default function AKEOSCommandCenterV1() {
               <p className="mt-5 text-[#d6ad63]">— Abraham Lincoln</p>
             </Panel>
 
-            <Panel title="Quick Glance" icon="▤">
-              <div className="space-y-4 text-sm">
-                {quickGlanceItems.map(([label, value]) => (
-                  <div
-                    key={label}
-                    className="flex items-center justify-between border-b border-[#24445a] pb-3"
-                  >
-                    <span className="text-[#c6d2da]">{label}</span>
-                    <span className="text-right text-white">{value}</span>
-                  </div>
-                ))}
-              </div>
-            </Panel>
+            <Panel title="Execution Readiness" icon="◈">
+  <div className="text-center">
+    <div className="text-6xl font-semibold text-[#f3d28d]">
+      {executionReadiness.score}
+      <span className="text-2xl text-[#8ea3b0]">/100</span>
+    </div>
+
+    <div className="mt-2 text-sm uppercase tracking-[0.2em] text-emerald-300">
+      {executionReadiness.status}
+    </div>
+  </div>
+
+  <div className="mt-6 space-y-3 text-sm">
+    {executionReadiness.signals.map(([label, value]) => (
+      <div
+        key={label}
+        className="flex items-center justify-between border-b border-[#24445a] pb-3"
+      >
+        <span className="text-[#c6d2da]">{label}</span>
+        <span className="text-right text-white">{value}</span>
+      </div>
+    ))}
+  </div>
+
+  <div className="mt-5 rounded-lg border border-[#d6ad63]/30 bg-[#d6ad63]/10 p-3 text-sm leading-6 text-[#f3e6c8]">
+    {executionReadiness.insight}
+  </div>
+</Panel>
           </div>
 
           <div className="mt-5 grid gap-5 xl:grid-cols-[1.4fr_.8fr_.9fr]">
