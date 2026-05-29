@@ -1,0 +1,138 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://akeos.local/schema/daily-brief.schema.json",
+  "title": "AKEOS Daily Executive Brief",
+  "description": "Canonical data contract produced by n8n and consumed by the AKEOS Command Center dashboard.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "generatedAt",
+    "todaySummary",
+    "meetings",
+    "priorityEmails",
+    "followUps",
+    "priorities",
+    "risks",
+    "recommendedAction"
+  ],
+  "properties": {
+    "generatedAt": {
+      "type": "string",
+      "description": "Timestamp for when n8n generated the brief. ISO 8601 is recommended."
+    },
+    "todaySummary": {
+      "type": "string",
+      "description": "Markdown-compatible daily summary. Lines beginning with #, ##, and - receive light dashboard formatting."
+    },
+    "meetings": {
+      "type": "array",
+      "description": "Strategic meetings for the day.",
+      "items": {
+        "$ref": "#/$defs/meeting"
+      },
+      "default": []
+    },
+    "priorityEmails": {
+      "type": "array",
+      "description": "High-priority email items. Currently used by the dashboard metric count.",
+      "items": {
+        "$ref": "#/$defs/priorityEmail"
+      },
+      "default": []
+    },
+    "followUps": {
+      "type": "array",
+      "description": "Follow-up actions or people to contact.",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "default": []
+    },
+    "priorities": {
+      "type": "array",
+      "description": "Current priorities rendered in the dashboard.",
+      "items": {
+        "$ref": "#/$defs/priority"
+      },
+      "default": []
+    },
+    "risks": {
+      "type": "array",
+      "description": "Current risks or concerns.",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "default": []
+    },
+    "recommendedAction": {
+      "type": "string",
+      "description": "Single recommended next action shown in the Execution Readiness card."
+    }
+  },
+  "$defs": {
+    "meeting": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["title"],
+      "properties": {
+        "time": {
+          "type": "string",
+          "description": "Display time, for example 09:00 or TBD."
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "badge": {
+          "type": "string",
+          "description": "Meeting classification, for example Critical, Strategic, Family, or Normal."
+        },
+        "prep": {
+          "type": "string",
+          "description": "Preparation note shown below the meeting title."
+        }
+      }
+    },
+    "priorityEmail": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["subject"],
+      "properties": {
+        "from": {
+          "type": "string"
+        },
+        "subject": {
+          "type": "string",
+          "minLength": 1
+        },
+        "summary": {
+          "type": "string"
+        },
+        "urgency": {
+          "type": "string",
+          "description": "Urgency classification, for example High, Medium, or Low."
+        },
+        "actionRequired": {
+          "type": "string"
+        }
+      }
+    },
+    "priority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["title"],
+      "properties": {
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "status": {
+          "type": "string",
+          "description": "Status badge shown on the priority row, for example High or Medium."
+        }
+      }
+    }
+  }
+}

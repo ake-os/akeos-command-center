@@ -33,12 +33,30 @@ If `daily-brief.json` is missing, invalid, empty, or fails to load, the dashboar
 
 ## n8n Integration
 
-n8n should generate or update `public/daily-brief.json` using the canonical schema. After that file changes, the running dashboard will pick up the new data on its next 60-second refresh without code changes.
+n8n is the upstream producer for the dashboard. Calendar, Gmail, Slack, Notion, and AI brief-generation workflows should publish their final output into `public/daily-brief.json` using the canonical schema. After that file changes, the running dashboard will pick up the new data on its next 60-second refresh without code changes.
+
+In local development, n8n should write to:
+
+```text
+/Users/akeos/akeos/projects/akeos-command-center/public/daily-brief.json
+```
+
+Write a complete temporary file first, then rename it atomically:
+
+```text
+/Users/akeos/akeos/projects/akeos-command-center/public/daily-brief.tmp.json
+-> /Users/akeos/akeos/projects/akeos-command-center/public/daily-brief.json
+```
+
+The dashboard polls `/daily-brief.json` every 60 seconds. Malformed JSON, an empty file, a missing file, or a payload with no usable brief content falls back to the existing Obsidian markdown flow.
+
+Detailed n8n mapping and write instructions live in `docs/n8n-daily-brief-contract.md`. The formal JSON Schema lives in `schema/daily-brief.schema.json`.
 
 Suggested integration mapping:
 
 - Google Calendar populates `meetings`.
 - Gmail populates `priorityEmails`, `followUps`, `risks`, and `recommendedAction`.
+- AI brief writer populates `todaySummary`, `priorities`, `risks`, and `recommendedAction`.
 - Slack populates `followUps`, `risks`, and priority context.
 - Notion populates `priorities`, project context, and open action items.
 - Obsidian remains available as the fallback daily-log source.
