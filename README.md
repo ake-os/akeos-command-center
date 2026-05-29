@@ -1,16 +1,44 @@
-# React + Vite
+# AKEOS Command Center
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+AKEOS Command Center is a React and Vite dashboard for the Daily Executive Brief.
 
-Currently, two official plugins are available:
+## Daily Brief Data Source
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+The primary data source is `public/daily-brief.json`. Vite serves that file at `/daily-brief.json`, and `src/lib/loadDailyBrief.js` fetches it with a cache-busting query string and refreshes it every 60 seconds.
 
-## React Compiler
+The dashboard expects this canonical shape:
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+```json
+{
+  "generatedAt": "",
+  "todaySummary": "",
+  "meetings": [],
+  "priorityEmails": [],
+  "followUps": [],
+  "priorities": [],
+  "risks": [],
+  "recommendedAction": ""
+}
+```
 
-## Expanding the ESLint configuration
+`src/App.jsx` consumes the normalized brief and renders the existing dashboard cards without changing layout, styling, colors, typography, or branding.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Fallback Source
+
+If `daily-brief.json` is missing, invalid, empty, or fails to load, the dashboard falls back to the existing Obsidian flow:
+
+- `src/services/obsidian.js` fetches the current daily log markdown.
+- `src/services/briefParser.js` parses markdown sections into brief fields.
+- `src/App.jsx` normalizes that parsed result into the same daily brief shape used by the JSON source.
+
+## n8n Integration
+
+n8n should generate or update `public/daily-brief.json` using the canonical schema. After that file changes, the running dashboard will pick up the new data on its next 60-second refresh without code changes.
+
+Suggested integration mapping:
+
+- Google Calendar populates `meetings`.
+- Gmail populates `priorityEmails`, `followUps`, `risks`, and `recommendedAction`.
+- Slack populates `followUps`, `risks`, and priority context.
+- Notion populates `priorities`, project context, and open action items.
+- Obsidian remains available as the fallback daily-log source.

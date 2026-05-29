@@ -1,0 +1,49 @@
+{
+  "generatedAt": "2026-05-29T07:00:00+02:00",
+  "todaySummary": "# Daily Executive Brief\n\n## Executive Summary\n- Execute with excellence across GTM priorities, leadership alignment, and family coordination.\n- Protect strategic focus from operational overload and excessive context switching.\n- Use today's brief as the single source for priorities, risks, follow-ups, and next action.",
+  "meetings": [
+    {
+      "time": "09:00",
+      "title": "Board Strategy Review",
+      "badge": "Critical",
+      "prep": "Revenue forecast + GTM risks"
+    },
+    {
+      "time": "13:00",
+      "title": "Stuttgart Strategy Days Prep",
+      "badge": "Strategic",
+      "prep": "Leadership narrative alignment"
+    },
+    {
+      "time": "17:30",
+      "title": "Family Planning Session",
+      "badge": "Family",
+      "prep": "Germany/US coordination"
+    }
+  ],
+  "priorityEmails": [],
+  "followUps": [
+    "Confirm owners for Stuttgart Strategy Days preparation",
+    "Review GTM War Room metrics for executive synthesis",
+    "Clarify coverage plan if Swen's daily briefing is unavailable"
+  ],
+  "priorities": [
+    {
+      "title": "Drive GTM Execution & Pipeline",
+      "status": "High"
+    },
+    {
+      "title": "Prepare Strategy Days Stuttgart",
+      "status": "High"
+    },
+    {
+      "title": "Increase Strategic Visibility",
+      "status": "Medium"
+    }
+  ],
+  "risks": [
+    "Operational overload and excessive context switching",
+    "Overdependence on Swen's daily briefing when unavailable"
+  ],
+  "recommendedAction": "Protect the first deep-work block for GTM execution before reacting to operational requests."
+}

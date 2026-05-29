@@ -1,6 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { fetchDailyLog } from "./services/obsidian";
 import { parseDailyBrief } from "./services/briefParser";
+import {
+  isDailyBriefEmpty,
+  normalizeDailyBrief,
+  useDailyBrief,
+} from "./lib/loadDailyBrief";
 
 const today = new Date();
 
@@ -40,22 +45,6 @@ const weatherHomes = [
   },
 ];
 
-const fallbackPriorities = [
-  ["Drive GTM Execution & Pipeline", "High"],
-  ["Prepare Strategy Days Stuttgart", "High"],
-  ["Increase Strategic Visibility", "Medium"],
-];
-
-const fallbackRisks = [
-  "Operational overload and excessive context switching",
-  "Overdependence on Swen’s daily briefing when unavailable",
-];
-
-const fallbackOpportunities = [
-  "Turn War Room metrics into executive synthesis",
-  "Use AKEOS as a GTM intelligence layer",
-];
-
 const quickGlanceItems = [
   ["Focus Today", "Execute with Excellence"],
   ["Top Priority", "GTM Execution & Pipeline"],
@@ -82,30 +71,9 @@ const navItems = [
   ["♧", "Resources", false],
   ["⚙", "Settings", false],
 ];
-const strategicMeetings = [
-  {
-    time: "09:00",
-    title: "Board Strategy Review",
-    badge: "Critical",
-    prep: "Revenue forecast + GTM risks",
-  },
-  {
-    time: "13:00",
-    title: "Stuttgart Strategy Days Prep",
-    badge: "Strategic",
-    prep: "Leadership narrative alignment",
-  },
-  {
-    time: "17:30",
-    title: "Family Planning Session",
-    badge: "Family",
-    prep: "Germany/US coordination",
-  },
-];
-const executionReadiness = {
+const baseExecutionReadiness = {
   score: 82,
   status: "High Readiness",
-  insight: "Today favors strategic execution over reactive operations.",
   signals: [
     ["Strategic Alignment", "High"],
     ["Meeting Load", "Moderate"],
@@ -162,40 +130,120 @@ function FooterLink({ children }) {
   );
 }
 
+function parsedBriefToDailyBrief(parsedBrief) {
+  return normalizeDailyBrief({
+    todaySummary: parsedBrief.executiveSummary || parsedBrief.raw,
+    meetings: parsedBrief.strategicMeetings,
+    followUps: parsedBrief.peopleFollowUps,
+    priorities: parsedBrief.priorities,
+    risks: parsedBrief.risks,
+    recommendedAction: parsedBrief.strategicReminder,
+  });
+}
+
+function getGeneratedLabel(brief, source, isLoading) {
+  if (isLoading) {
+    return "Loading brief data";
+  }
+
+  if (!brief) {
+    return "No live brief source available";
+  }
+
+  if (!brief.generatedAt) {
+    return `Generated this morning • Live from ${source}`;
+  }
+
+  const generatedAt = new Date(brief.generatedAt);
+
+  if (Number.isNaN(generatedAt.getTime())) {
+    return `Generated this morning • Live from ${source}`;
+  }
+
+  return `Generated ${generatedAt.toLocaleString(undefined, {
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  })} • Live from ${source}`;
+}
+
 export default function AKEOSCommandCenterV1() {
-  const [dailyLog, setDailyLog] = useState("");
-  const [dailyLogError, setDailyLogError] = useState("");
-  const [parsedBrief, setParsedBrief] = useState(null);
+  const {
+    brief: dailyBrief,
+    status: dailyBriefStatus,
+  } = useDailyBrief();
+  const [obsidianBrief, setObsidianBrief] = useState(null);
+  const [obsidianError, setObsidianError] = useState("");
+  const [obsidianStatus, setObsidianStatus] = useState("idle");
 
   useEffect(() => {
+    const shouldUseObsidianFallback =
+      dailyBriefStatus === "empty" || dailyBriefStatus === "error";
+
+    if (
+      !shouldUseObsidianFallback ||
+      obsidianStatus === "loading" ||
+      obsidianStatus === "success"
+    ) {
+      return;
+    }
+
+    let isMounted = true;
+
+    setObsidianStatus("loading");
+    setObsidianError("");
+
     fetchDailyLog()
       .then((text) => {
-        setDailyLog(text);
-        setParsedBrief(parseDailyBrief(text));
+        if (!isMounted) {
+          return;
+        }
+
+        setObsidianBrief(parsedBriefToDailyBrief(parseDailyBrief(text)));
+        setObsidianStatus("success");
       })
       .catch((error) => {
+        if (!isMounted) {
+          return;
+        }
+
         console.error(error);
-        setDailyLogError("Daily Executive Brief is not available yet.");
+        setObsidianError("Daily Executive Brief is not available yet.");
+        setObsidianStatus("error");
       });
-  }, []);
 
-  const priorities =
-    parsedBrief?.priorities?.length > 0
-      ? parsedBrief.priorities.map((item) => [item, "High"])
-      : fallbackPriorities;
+    return () => {
+      isMounted = false;
+    };
+  }, [dailyBriefStatus, obsidianStatus]);
 
-  const risks =
-    parsedBrief?.risks?.length > 0 ? parsedBrief.risks : fallbackRisks;
-
-  const opportunities =
-    parsedBrief?.opportunities?.length > 0
-      ? parsedBrief.opportunities
-      : fallbackOpportunities;
-
+  const hasPrimaryBrief =
+    dailyBriefStatus === "success" && !isDailyBriefEmpty(dailyBrief);
+  const activeBrief = hasPrimaryBrief ? dailyBrief : obsidianBrief;
+  const activeSource = hasPrimaryBrief ? "daily-brief.json" : "Obsidian";
+  const isBriefLoading =
+    dailyBriefStatus === "loading" ||
+    (!hasPrimaryBrief && obsidianStatus === "loading");
+  const priorities = activeBrief?.priorities || [];
+  const risks = activeBrief?.risks || [];
+  const meetings = activeBrief?.meetings || [];
+  const followUps = activeBrief?.followUps || [];
+  const priorityEmails = activeBrief?.priorityEmails || [];
   const summary =
-    parsedBrief?.executiveSummary ||
-    dailyLogError ||
-    "Loading Daily Executive Brief...";
+    activeBrief?.todaySummary ||
+    obsidianError ||
+    (isBriefLoading
+      ? "Loading Daily Executive Brief..."
+      : "Daily Executive Brief is not available yet.");
+  const executionReadiness = {
+    ...baseExecutionReadiness,
+    insight:
+      activeBrief?.recommendedAction ||
+      (isBriefLoading
+        ? "Loading recommended action..."
+        : "No recommended action available."),
+  };
 
   return (
     <main className="min-h-screen bg-[#061827] text-[#f7f0df]">
@@ -340,135 +388,181 @@ export default function AKEOSCommandCenterV1() {
               className="xl:row-span-2"
             >
               <div className="text-xs text-[#8ea3b0]">
-                Generated this morning • Live from Obsidian
+                {getGeneratedLabel(activeBrief, activeSource, isBriefLoading)}
               </div>
 
               <div className="mt-5 max-h-[320px] overflow-y-auto rounded-lg border border-[#24445a] bg-[#0a263a]/40 p-5">
                 <div className="space-y-4 text-sm leading-7 text-[#e5edf2]">
                   {summary
-  .split("\n")
-  .filter((line) => line.trim() !== "")
-  .map((line, index) => {
-    if (line.startsWith("# ")) {
-      return (
-        <h2 key={index} className="text-lg font-semibold text-white">
-          {line.replace("# ", "")}
-        </h2>
-      );
-    }
+                    .split("\n")
+                    .filter((line) => line.trim() !== "")
+                    .map((line, index) => {
+                      if (line.startsWith("# ")) {
+                        return (
+                          <h2 key={index} className="text-lg font-semibold text-white">
+                            {line.replace("# ", "")}
+                          </h2>
+                        );
+                      }
 
-    if (line.startsWith("## ")) {
-      return (
-        <h3 key={index} className="pt-2 text-base font-semibold text-[#f3d28d]">
-          {line.replace("## ", "")}
-        </h3>
-      );
-    }
+                      if (line.startsWith("## ")) {
+                        return (
+                          <h3 key={index} className="pt-2 text-base font-semibold text-[#f3d28d]">
+                            {line.replace("## ", "")}
+                          </h3>
+                        );
+                      }
 
-    if (line.startsWith("- ")) {
-      return (
-        <div key={index} className="flex gap-3">
-          <span className="text-[#d6ad63]">•</span>
-          <span>{line.replace("- ", "")}</span>
-        </div>
-      );
-    }
+                      if (line.startsWith("- ")) {
+                        return (
+                          <div key={index} className="flex gap-3">
+                            <span className="text-[#d6ad63]">•</span>
+                            <span>{line.replace("- ", "")}</span>
+                          </div>
+                        );
+                      }
 
-    return <p key={index}>{line}</p>;
-  })}
+                      return <p key={index}>{line}</p>;
+                    })}
                 </div>
               </div>
 
               <div className="mt-6 grid grid-cols-2 gap-3 md:grid-cols-4">
-                <MetricBox icon="✓" value="3" label="Priorities On Track" />
+                <MetricBox
+                  icon="✓"
+                  value={priorities.length}
+                  label="Priorities On Track"
+                />
                 <MetricBox icon="⚠" value={risks.length} label="Risks Monitoring" />
                 <MetricBox
                   icon="↗"
-                  value={opportunities.length}
-                  label="Opportunities Active"
+                  value={followUps.length}
+                  label="Follow Ups Active"
                 />
-                <MetricBox icon="▣" value="5" label="Commitments This Week" />
+                <MetricBox
+                  icon="▣"
+                  value={priorityEmails.length}
+                  label="Priority Emails"
+                />
               </div>
 
               <FooterLink>Open Full Brief</FooterLink>
             </Panel>
 
             <Panel title="2. Strategic Meetings" icon="✦">
-  <div className="space-y-4 text-sm">
-    {strategicMeetings.map((meeting) => (
-      <div
-        key={meeting.title}
-        className="rounded-xl border border-[#24445a] bg-[#0a263a] p-4"
-      >
-        <div className="flex items-center justify-between">
-          <div className="text-[#f3d28d]">{meeting.time}</div>
+              <div className="space-y-4 text-sm">
+                {meetings.length > 0 ? (
+                  meetings.map((meeting) => (
+                    <div
+                      key={meeting.title}
+                      className="rounded-xl border border-[#24445a] bg-[#0a263a] p-4"
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="text-[#f3d28d]">{meeting.time}</div>
 
-          <Status
-            tone={
-              meeting.badge === "Critical"
-                ? "red"
-                : meeting.badge === "Strategic"
-                ? "gold"
-                : "green"
-            }
-          >
-            {meeting.badge}
-          </Status>
-        </div>
+                        <Status
+                          tone={
+                            meeting.badge === "Critical"
+                              ? "red"
+                              : meeting.badge === "Strategic"
+                              ? "gold"
+                              : "green"
+                          }
+                        >
+                          {meeting.badge}
+                        </Status>
+                      </div>
 
-        <div className="mt-2 text-base text-white">
-          {meeting.title}
-        </div>
+                      <div className="mt-2 text-base text-white">
+                        {meeting.title}
+                      </div>
 
-        <div className="mt-2 text-xs text-[#aab7c0]">
-          Prep: {meeting.prep}
-        </div>
-      </div>
-    ))}
-  </div>
+                      <div className="mt-2 text-xs text-[#aab7c0]">
+                        Prep: {meeting.prep}
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="rounded-xl border border-[#24445a] bg-[#0a263a] p-4 text-[#b7c5cf]">
+                    {isBriefLoading
+                      ? "Loading strategic meetings..."
+                      : "No strategic meetings scheduled."}
+                  </div>
+                )}
+              </div>
 
-  <FooterLink>View Full Meeting Intelligence</FooterLink>
-</Panel>
+              <FooterLink>View Full Meeting Intelligence</FooterLink>
+            </Panel>
 
             <Panel title="3. Current Priorities" icon="☷">
               <div className="space-y-4">
-                {priorities.slice(0, 3).map(([priority, status], index) => (
-                  <div key={priority} className="flex items-center gap-4">
-                    <div className="flex h-9 w-9 items-center justify-center rounded-full border border-[#d6ad63] text-[#d6ad63]">
-                      {index + 1}
+                {priorities.length > 0 ? (
+                  priorities.slice(0, 3).map((priority, index) => (
+                    <div key={priority.title} className="flex items-center gap-4">
+                      <div className="flex h-9 w-9 items-center justify-center rounded-full border border-[#d6ad63] text-[#d6ad63]">
+                        {index + 1}
+                      </div>
+                      <div className="flex-1 text-sm text-white">{priority.title}</div>
+                      <Status tone={priority.status === "High" ? "green" : "gold"}>
+                        {priority.status}
+                      </Status>
                     </div>
-                    <div className="flex-1 text-sm text-white">{priority}</div>
-                    <Status tone={status === "High" ? "green" : "gold"}>
-                      {status}
-                    </Status>
+                  ))
+                ) : (
+                  <div className="text-sm text-[#b7c5cf]">
+                    {isBriefLoading
+                      ? "Loading priorities..."
+                      : "No current priorities reported."}
                   </div>
-                ))}
+                )}
               </div>
               <FooterLink>View All Priorities</FooterLink>
             </Panel>
 
             <Panel title="4. Current Risks / Concerns" icon="♢">
               <ul className="space-y-4 text-sm text-[#e5edf2]">
-                {risks.map((risk) => (
-                  <li key={risk} className="flex gap-3">
+                {risks.length > 0 ? (
+                  risks.map((risk) => (
+                    <li key={risk} className="flex gap-3">
+                      <span className="text-red-400">●</span>
+                      <span>{risk}</span>
+                    </li>
+                  ))
+                ) : (
+                  <li className="flex gap-3">
                     <span className="text-red-400">●</span>
-                    <span>{risk}</span>
+                    <span>
+                      {isBriefLoading
+                        ? "Loading risks..."
+                        : "No current risks reported."}
+                    </span>
                   </li>
-                ))}
+                )}
               </ul>
               <FooterLink>View All Risks</FooterLink>
             </Panel>
 
-            <Panel title="5. Current Opportunities" icon="⌁">
+            <Panel title="5. Follow Ups" icon="⌁">
               <ul className="space-y-4 text-sm text-[#e5edf2]">
-                {opportunities.map((opp) => (
-                  <li key={opp} className="flex gap-3">
+                {followUps.length > 0 ? (
+                  followUps.map((followUp) => (
+                    <li key={followUp} className="flex gap-3">
+                      <span className="text-emerald-400">●</span>
+                      <span>{followUp}</span>
+                    </li>
+                  ))
+                ) : (
+                  <li className="flex gap-3">
                     <span className="text-emerald-400">●</span>
-                    <span>{opp}</span>
+                    <span>
+                      {isBriefLoading
+                        ? "Loading follow ups..."
+                        : "No follow ups reported."}
+                    </span>
                   </li>
-                ))}
+                )}
               </ul>
-              <FooterLink>View All Opportunities</FooterLink>
+              <FooterLink>View All Follow Ups</FooterLink>
             </Panel>
           </div>
         </section>
