@@ -27,10 +27,16 @@ flowchart LR
 
 ## Output Target
 
-In local development, n8n should write the generated JSON to:
+In local development, mount the dashboard public directory into the n8n container:
 
 ```text
-/Users/akeos/akeos/projects/akeos-command-center/public/daily-brief.json
+/Users/akeos/akeos/projects/akeos-command-center/public:/dashboard-public
+```
+
+n8n should write the generated JSON to:
+
+```text
+/dashboard-public/daily-brief.json
 ```
 
 Vite serves that file as:
@@ -43,7 +49,7 @@ The dashboard polls `/daily-brief.json` every 60 seconds. If the file is missing
 
 ## Atomic Write Requirement
 
-n8n should never write directly over `daily-brief.json` while the dashboard may be reading it. Write a complete temporary file first, validate it, then rename it over the final path.
+n8n should preferably avoid writing directly over `daily-brief.json` while the dashboard may be reading it. Write a complete temporary file first, validate it, then rename it over the final path when the n8n runtime supports command execution. In the local n8n 2.19.5 container, `Execute Command` is unavailable, so AKEOS-004 writes the temp file first and then writes the final file with a second `Read/Write Files from Disk` node.
 
 Recommended local-dev sequence:
 
@@ -51,8 +57,8 @@ Recommended local-dev sequence:
 1. Build the canonical JSON payload in n8n.
 2. Validate the payload against schema/daily-brief.schema.json.
 3. Write the payload to:
-   /Users/akeos/akeos/projects/akeos-command-center/public/daily-brief.tmp.json
-4. Rename daily-brief.tmp.json to daily-brief.json.
+   /dashboard-public/daily-brief.tmp.json
+4. Publish daily-brief.json by atomic rename when available, or by a second file-write node in this local n8n runtime.
 ```
 
 The rename step should be atomic on the same filesystem. If n8n runs somewhere other than the dashboard host, publish the same JSON payload to whichever static asset location serves `/daily-brief.json` in that environment.
@@ -193,3 +199,11 @@ schema/daily-brief.schema.json
 ```
 
 Use it in n8n before the file write if your n8n environment has JSON Schema validation available. If not, keep the final mapper strict and ensure the top-level fields always exist with empty arrays or empty strings as needed.
+
+## AKEOS-004 Implementation Steps
+
+The exact n8n node sequence, node names, Code node contents, expressions, file-write method, and Docker path notes live at:
+
+```text
+docs/akeos-004-n8n-implementation.md
+```

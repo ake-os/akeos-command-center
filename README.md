@@ -35,22 +35,30 @@ If `daily-brief.json` is missing, invalid, empty, or fails to load, the dashboar
 
 n8n is the upstream producer for the dashboard. Calendar, Gmail, Slack, Notion, and AI brief-generation workflows should publish their final output into `public/daily-brief.json` using the canonical schema. After that file changes, the running dashboard will pick up the new data on its next 60-second refresh without code changes.
 
-In local development, n8n should write to:
+In local development, mount the dashboard public directory into the n8n container:
 
 ```text
-/Users/akeos/akeos/projects/akeos-command-center/public/daily-brief.json
+/Users/akeos/akeos/projects/akeos-command-center/public:/dashboard-public
 ```
 
-Write a complete temporary file first, then rename it atomically:
+n8n should write to the container path:
 
 ```text
-/Users/akeos/akeos/projects/akeos-command-center/public/daily-brief.tmp.json
--> /Users/akeos/akeos/projects/akeos-command-center/public/daily-brief.json
+/dashboard-public/daily-brief.json
 ```
+
+Write a complete temporary file first, then publish the final file:
+
+```text
+/dashboard-public/daily-brief.tmp.json
+-> /dashboard-public/daily-brief.json
+```
+
+Use an atomic rename when the n8n runtime supports command execution. The local n8n 2.19.5 container does not recognize the `Execute Command` node, so the active AKEOS-004 workflow publishes the final file with a second `Read/Write Files from Disk` node.
 
 The dashboard polls `/daily-brief.json` every 60 seconds. Malformed JSON, an empty file, a missing file, or a payload with no usable brief content falls back to the existing Obsidian markdown flow.
 
-Detailed n8n mapping and write instructions live in `docs/n8n-daily-brief-contract.md`. The formal JSON Schema lives in `schema/daily-brief.schema.json`.
+Detailed n8n mapping and write instructions live in `docs/n8n-daily-brief-contract.md`. The exact AKEOS-004 n8n implementation steps live in `docs/akeos-004-n8n-implementation.md`. The formal JSON Schema lives in `schema/daily-brief.schema.json`.
 
 Suggested integration mapping:
 
